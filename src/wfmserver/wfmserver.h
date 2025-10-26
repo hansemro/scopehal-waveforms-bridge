@@ -36,13 +36,14 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <shlwapi.h>
+#include <dwf.h>
+#else
+#include <digilent/waveforms/dwf.h>
 #endif
 
 #include <thread>
 #include <map>
 #include <mutex>
-
-#include <digilent/waveforms/dwf.h>
 
 extern Socket g_scpiSocket;
 extern Socket g_dataSocket;
