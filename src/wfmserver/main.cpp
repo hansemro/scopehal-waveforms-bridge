@@ -79,7 +79,11 @@ size_t g_numAnalogInChannels = 0;
 Socket g_scpiSocket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 Socket g_dataSocket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
+#ifdef _WIN32
+BOOL WINAPI OnQuit(DWORD signal);
+#else
 void OnQuit(int signal);
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -277,8 +281,12 @@ int main(int argc, char* argv[])
 		g_channelOn[i] = false;
 
 	//Set up signal handlers
+#ifdef _WIN32
+	SetConsoleCtrlHandler(OnQuit, TRUE);
+#else
 	signal(SIGINT, OnQuit);
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	//Configure the data plane socket
 	g_dataSocket.Bind(waveform_port);
@@ -314,8 +322,14 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+#ifdef _WIN32
+BOOL WINAPI OnQuit(DWORD signal)
+{
+	(void)signal;
+#else
 void OnQuit(int /*signal*/)
 {
+#endif
 	LogNotice("Shutting down...\n");
 
 	lock_guard<mutex> lock(g_mutex);
